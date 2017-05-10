@@ -1,0 +1,20 @@
+image: Visual Studio 2017
+
+init:
+  - git config --global core.autocrlf input
+
+skip_branch_with_pr: true
+skip_tags: true
+skip_commits:
+  files:
+    - '**/*.md'
+
+nuget:
+  disable_publish_on_pr: true
+
+build_script:
+  - dotnet build
+
+test: off
+test_script:
+  - dotnet test tests/SyndicationCore.Tests/SyndicationCore.Tests.csproj
