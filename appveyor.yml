@@ -12,6 +12,9 @@ skip_commits:
 nuget:
   disable_publish_on_pr: true
 
+before_build:
+  - dotnet restore
+
 build_script:
   - dotnet build
 
