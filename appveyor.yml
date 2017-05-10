@@ -16,8 +16,13 @@ before_build:
   - dotnet restore
 
 build_script:
-  - dotnet build
+  - dotnet build --configuration Release
+  - dotnet pack src/SyndicationCore/SyndicationCore.csproj --configuration Release --include-symbols
 
 test: off
 test_script:
   - dotnet test tests/SyndicationCore.Tests/SyndicationCore.Tests.csproj
+
+artifacts:
+  - path: 'src/SyndicationCore/bin/**/*.nupkg'
+    name: NuGet

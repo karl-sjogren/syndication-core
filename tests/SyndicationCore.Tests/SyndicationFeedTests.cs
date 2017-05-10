@@ -69,7 +69,6 @@ namespace SyndicationCore.Tests {
             var rssGenerator = new Rss20SyndicationGenerator();
             var result = rssGenerator.Generate(feed);
 
-
             var item = result.Descendants("item").FirstOrDefault();
             Assert.NotNull(item);
 
