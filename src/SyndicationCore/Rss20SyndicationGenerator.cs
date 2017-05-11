@@ -13,9 +13,12 @@ namespace SyndicationCore {
             if(string.IsNullOrWhiteSpace(feed.Description))
                 throw new ArgumentException("Description needs to be set.");
 
+            XNamespace nsAtom = "http://www.w3.org/2005/Atom";
+
             var channel = new XElement("channel");
-            var rss = new XElement("rss", new XAttribute("version", "2.0"), channel);
+            var rss = new XElement("rss", new XAttribute("version", "2.0"), new XAttribute(XNamespace.Xmlns + "atom", nsAtom), channel);
             var document = new XDocument(rss);
+            document.Declaration = new XDeclaration("1.0", "utf-8", null);
 
             // Required fields
             channel.Add(new XElement("title", feed.Title));
@@ -28,9 +31,13 @@ namespace SyndicationCore {
 
             // Optional fields
             channel.AddOptionalElement("category", string.Join(" / ", feed.Categories));
-            channel.AddOptionalElement("description", feed.Description);
             channel.AddOptionalElement("language", feed.Language?.ToString());
             channel.AddOptionalElement("image", feed.Image?.ToString());
+
+            channel.Add(new XElement(nsAtom + "link",
+                new XAttribute("href", feed.FeedUrl),
+                new XAttribute("rel", "self"),
+                new XAttribute("type", "application/rss+xml")));
 
             if(feed.TimeToLive != TimeSpan.Zero)
                 channel.Add(new XElement("ttl", feed.TimeToLive.TotalMinutes));
@@ -44,15 +51,19 @@ namespace SyndicationCore {
                     continue;
                 }
 
-                element.Add(new XElement("title", item.Title));
-                element.Add(new XElement("link", item.Link));
-                element.Add(new XElement("author", item.Author?.Email));
-                element.Add(new XElement("pubDate", item.PublishDate.ToRFC822()));
-                element.Add(new XElement("category", string.Join(" / ", item.Categories)));
-                element.Add(new XElement("guid", item.Permalink));
+                var author = item.Author?.Email;
+                if(author != null && !string.IsNullOrWhiteSpace(item.Author?.Name))
+                    author += $" ({item.Author.Name})";
+
+                element.AddOptionalElement("title", item.Title);
+                element.AddOptionalElement("link", item.Link);
+                element.AddOptionalElement("author", author);
+                element.AddOptionalElement("pubDate", item.PublishDate.ToRFC822());
+                element.AddOptionalElement("category", string.Join(" / ", item.Categories));
+                element.AddOptionalElement("guid", item.Permalink);
 
                 if(!string.IsNullOrWhiteSpace(item.Body))
-                    element.Add(new XElement("description", new XCData(item.Body)));
+                    element.Add(new XElement("description", item.Body));
 
                 if(!string.IsNullOrWhiteSpace(feed.Title) && feed.FeedUrl != null)
                     element.Add(new XElement("source", feed.Title, new XAttribute("url", feed.FeedUrl)));

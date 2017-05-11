@@ -4,6 +4,7 @@ using Xunit;
 using SyndicationCore;
 using System.Globalization;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace SyndicationCore.Tests {
     public class SyndicationFeedTests {
@@ -56,6 +57,8 @@ namespace SyndicationCore.Tests {
             var rssGenerator = new Rss20SyndicationGenerator();
             var result = rssGenerator.Generate(feed);
 
+            XNamespace nsAtom = "http://www.w3.org/2005/Atom";
+
             var channel = result.Element("rss").Element("channel");
             Assert.Equal("Test feed", channel.Element("title")?.Value);
             Assert.Equal("Test description", channel.Element("description")?.Value);
@@ -64,6 +67,7 @@ namespace SyndicationCore.Tests {
             Assert.Equal("30", channel.Element("ttl")?.Value);
             Assert.Equal("en-UK", channel.Element("language")?.Value);
             Assert.Equal("Articles / News", channel.Element("category")?.Value);
+            Assert.Equal("http://localhost/rss/", channel.Element(nsAtom + "link")?.Attribute("href")?.Value);
         }
 
         [Fact]
@@ -95,6 +99,7 @@ namespace SyndicationCore.Tests {
             Assert.Equal("Test item", item.Element("title")?.Value);
 
             Assert.Equal("Test feed", item.Element("source")?.Value);
+            Assert.Equal("test.person@example.com (Test person)", item.Element("author")?.Value);
             Assert.Equal("http://localhost/rss/", item.Element("source")?.Attribute("url")?.Value);
         }
     }
