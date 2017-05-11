@@ -38,7 +38,6 @@ deploy:
   - provider: NuGet
     api_key:
       secure: yP8Tsvals0wlkDqt45M5m4EEGY5EvUsy6h1BYeWYWnzbEXKOnrhqpNYx+yEd6YZH
-    symbol_server: https://your.symbol.server/feed
     artifact: NuGet
     on:
       branch: master
