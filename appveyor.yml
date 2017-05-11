@@ -20,7 +20,7 @@ nuget:
 
 before_build:
   - dotnet restore
-  - appveyor_patch_csproj.ps1
+  - powershell "./appveyor_patch_csproj.ps1"
 
 build_script:
   - dotnet build --configuration Release
