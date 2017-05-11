@@ -56,8 +56,7 @@ namespace SyndicationCore.Tests {
             var rssGenerator = new Rss20SyndicationGenerator();
             var result = rssGenerator.Generate(feed);
 
-
-            var channel = result.Element("channel");
+            var channel = result.Element("rss").Element("channel");
             Assert.Equal("Test feed", channel.Element("title")?.Value);
             Assert.Equal("Test description", channel.Element("description")?.Value);
             Assert.Equal("http://localhost/", channel.Element("link")?.Value);

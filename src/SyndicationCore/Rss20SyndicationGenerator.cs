@@ -13,26 +13,27 @@ namespace SyndicationCore {
             if(string.IsNullOrWhiteSpace(feed.Description))
                 throw new ArgumentException("Description needs to be set.");
 
-            var root = new XElement("channel", new XAttribute("version", "2.0"));
-            var channel = new XDocument(root);
+            var channel = new XElement("channel");
+            var rss = new XElement("rss", new XAttribute("version", "2.0"), channel);
+            var document = new XDocument(rss);
 
             // Required fields
-            root.Add(new XElement("title", feed.Title));
-            root.Add(new XElement("link", feed.SiteUrl));
-            root.Add(new XElement("description", feed.Description));
+            channel.Add(new XElement("title", feed.Title));
+            channel.Add(new XElement("link", feed.SiteUrl));
+            channel.Add(new XElement("description", feed.Description));
 
             // Calculated fields
-            root.Add(new XElement("lastBuildDate", DateTime.Now.ToRFC822()));
-            root.Add(new XElement("generator", "SyndicationCore/" + VersionHelper.ForType<Rss20SyndicationGenerator>()));
+            channel.Add(new XElement("lastBuildDate", DateTime.Now.ToRFC822()));
+            channel.Add(new XElement("generator", "SyndicationCore/" + VersionHelper.ForType<Rss20SyndicationGenerator>()));
 
             // Optional fields
-            root.AddOptionalElement("category", string.Join(" / ", feed.Categories));
-            root.AddOptionalElement("description", feed.Description);
-            root.AddOptionalElement("language", feed.Language?.ToString());
-            root.AddOptionalElement("image", feed.Image?.ToString());
+            channel.AddOptionalElement("category", string.Join(" / ", feed.Categories));
+            channel.AddOptionalElement("description", feed.Description);
+            channel.AddOptionalElement("language", feed.Language?.ToString());
+            channel.AddOptionalElement("image", feed.Image?.ToString());
 
             if(feed.TimeToLive != TimeSpan.Zero)
-                root.Add(new XElement("ttl", feed.TimeToLive.TotalMinutes));
+                channel.Add(new XElement("ttl", feed.TimeToLive.TotalMinutes));
 
             foreach (var item in feed.Items) {
                 var element = new XElement("item");
@@ -56,10 +57,10 @@ namespace SyndicationCore {
                 if(!string.IsNullOrWhiteSpace(feed.Title) && feed.FeedUrl != null)
                     element.Add(new XElement("source", feed.Title, new XAttribute("url", feed.FeedUrl)));
 
-                root.Add(element);
+                channel.Add(element);
             }
 
-            return channel;
+            return document;
         }
     }
 }
