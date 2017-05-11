@@ -8,7 +8,7 @@ namespace SyndicationCore {
         public string Description { get; set; }
         public Uri SiteUrl { get; set; }
         public Uri Image { get; set; }
-        public TimeSpan TimeToLive { get; set; } = TimeSpan.FromHours(1);
+        public TimeSpan TimeToLive { get; set; } = TimeSpan.Zero;
         public CultureInfo Language { get; set; }
         public string Copyright { get; set; }
         public List<string> Categories { get; set; } = new List<string>();

@@ -1,19 +1,26 @@
 image: Visual Studio 2017
 
+version: 1.0.0-build{build}
+
 init:
   - git config --global core.autocrlf input
 
 skip_branch_with_pr: true
-skip_tags: true
+skip_tags: false
 skip_commits:
   files:
     - '**/*.md'
+
+branches:
+  except:
+    - gh-pages
 
 nuget:
   disable_publish_on_pr: true
 
 before_build:
   - dotnet restore
+  - powershell "./appveyor_patch_csproj.ps1"
 
 build_script:
   - dotnet build --configuration Release
@@ -26,3 +33,12 @@ test_script:
 artifacts:
   - path: 'src/SyndicationCore/bin/**/*.nupkg'
     name: NuGet
+
+deploy:
+  - provider: NuGet
+    api_key:
+      secure: yP8Tsvals0wlkDqt45M5m4EEGY5EvUsy6h1BYeWYWnzbEXKOnrhqpNYx+yEd6YZH
+    symbol_server: https://your.symbol.server/feed
+    artifact: NuGet
+    on:
+      branch: master
