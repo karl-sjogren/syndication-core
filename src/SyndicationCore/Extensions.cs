@@ -1,4 +1,5 @@
 using System;
+using System.Xml.Linq;
 
 namespace SyndicationCore {
     public static class Extensions {
@@ -16,6 +17,16 @@ namespace SyndicationCore {
             }
  
             return date.ToString("ddd, dd MMM yyyy HH:mm:ss " + timeZone.PadRight(5, '0'));
+        }
+
+        public static void AddOptionalElement(this XElement element, XName name, object content) {
+            if(content == null)
+                return;
+            
+            if(content is string && string.IsNullOrWhiteSpace((content as string)))
+                return;
+            
+            element.Add(new XElement(name, content));
         }
     }
 }

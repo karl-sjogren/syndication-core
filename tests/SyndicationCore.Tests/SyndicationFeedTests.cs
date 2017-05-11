@@ -8,17 +8,36 @@ using System.Collections.Generic;
 namespace SyndicationCore.Tests {
     public class SyndicationFeedTests {
         [Fact]
-        public void RssGeneratorDoesntCrashOnEmptyItems() {
+        public void RssGeneratorThrowsOnMissingTitle() {
             var feed = new SyndicationFeed {
-                Items = new List<SyndicationItem> {
-                    new SyndicationItem {
-                        Author = new Author()
-                    }
-                }
+                Description = "Test description",
+                SiteUrl = new Uri("http://localhost/")
             };
 
             var rssGenerator = new Rss20SyndicationGenerator();
-            rssGenerator.Generate(feed);
+            Assert.Throws<ArgumentException>(() => rssGenerator.Generate(feed));
+        }
+
+        [Fact]
+        public void RssGeneratorThrowsOnMissingDescription() {
+            var feed = new SyndicationFeed {
+                Title = "Test feed",
+                SiteUrl = new Uri("http://localhost/")
+            };
+
+            var rssGenerator = new Rss20SyndicationGenerator();
+            Assert.Throws<ArgumentException>(() => rssGenerator.Generate(feed));
+        }
+
+        [Fact]
+        public void RssGeneratorThrowsOnMissingSiteUrl() {
+            var feed = new SyndicationFeed {
+                Title = "Test feed",
+                Description = "Test description"
+            };
+
+            var rssGenerator = new Rss20SyndicationGenerator();
+            Assert.Throws<ArgumentException>(() => rssGenerator.Generate(feed));
         }
 
         [Fact]
@@ -52,6 +71,8 @@ namespace SyndicationCore.Tests {
         public void RssGeneratorSetsItemProperties() {
             var feed = new SyndicationFeed {
                 Title = "Test feed",
+                Description = "Test description",
+                SiteUrl = new Uri("http://localhost/"),
                 FeedUrl = new Uri("http://localhost/rss/"),
                 Items = new List<SyndicationItem> {
                     new SyndicationItem {
