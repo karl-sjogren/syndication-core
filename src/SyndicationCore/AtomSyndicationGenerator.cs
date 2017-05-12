@@ -16,7 +16,6 @@ namespace SyndicationCore {
             XNamespace nsAtom = "http://www.w3.org/2005/Atom";
 
             var feedElement = new XElement(nsAtom + "feed");
-            //var rss = new XElement("rss", new XAttribute("version", "2.0"), new XAttribute(XNamespace.Xmlns + "atom", nsAtom), channel);
             var document = new XDocument(feedElement);
             document.Declaration = new XDeclaration("1.0", "utf-8", null);
 

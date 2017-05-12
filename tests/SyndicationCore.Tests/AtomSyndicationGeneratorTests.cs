@@ -80,13 +80,13 @@ namespace SyndicationCore.Tests {
             var result = generator.Generate(feed);
 
             XNamespace nsAtom = "http://www.w3.org/2005/Atom";
-Console.WriteLine(result.ToString());
+
             var item = result.Descendants(nsAtom + "entry").FirstOrDefault();
             Assert.NotNull(item);
 
             Assert.Equal("Test item", item.Element(nsAtom + "title")?.Value);
 
-            //Assert.Equal("Test feed", item.Element(nsAtom + "content")?.Value);
+            Assert.Equal("Test body", item.Element(nsAtom + "content")?.Value);
             Assert.Equal("Test person", item.Element(nsAtom + "author")?.Element(nsAtom + "name")?.Value);
             Assert.Equal("test.person@example.com", item.Element(nsAtom + "author")?.Element(nsAtom + "email")?.Value);
             Assert.Equal("http://localhost/authors/test-person", item.Element(nsAtom + "author")?.Element(nsAtom + "uri")?.Value);
