@@ -13,5 +13,14 @@ namespace SyndicationCore.Tests {
             
             Assert.Equal(expected, date.ToRFC822().Substring(0, expected.Length));
         }
+
+        [Theory]
+        [InlineData("2013-10-11T14:35:21", "2013-10-11T14:35:21+02:00")]
+        [InlineData("2017-05-10T20:30:00", "2017-05-10T20:30:00+02:00")]
+        public void RFC3339StringsAreGeneratedCorrectly(string input, string expected) {
+            var date = DateTime.Parse(input);
+            
+            Assert.Equal(expected, date.ToRFC3339().Substring(0, expected.Length));
+        }
     }
 }

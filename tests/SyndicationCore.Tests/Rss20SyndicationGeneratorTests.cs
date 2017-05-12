@@ -7,42 +7,42 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace SyndicationCore.Tests {
-    public class SyndicationFeedTests {
+    public class Rss20SyndicationGeneratorTests {
         [Fact]
-        public void RssGeneratorThrowsOnMissingTitle() {
+        public void GeneratorThrowsOnMissingTitle() {
             var feed = new SyndicationFeed {
                 Description = "Test description",
                 SiteUrl = new Uri("http://localhost/")
             };
 
-            var rssGenerator = new Rss20SyndicationGenerator();
-            Assert.Throws<ArgumentException>(() => rssGenerator.Generate(feed));
+            var generator = new Rss20SyndicationGenerator();
+            Assert.Throws<ArgumentException>(() => generator.Generate(feed));
         }
 
         [Fact]
-        public void RssGeneratorThrowsOnMissingDescription() {
+        public void GeneratorThrowsOnMissingDescription() {
             var feed = new SyndicationFeed {
                 Title = "Test feed",
                 SiteUrl = new Uri("http://localhost/")
             };
 
-            var rssGenerator = new Rss20SyndicationGenerator();
-            Assert.Throws<ArgumentException>(() => rssGenerator.Generate(feed));
+            var generator = new Rss20SyndicationGenerator();
+            Assert.Throws<ArgumentException>(() => generator.Generate(feed));
         }
 
         [Fact]
-        public void RssGeneratorThrowsOnMissingSiteUrl() {
+        public void GeneratorThrowsOnMissingSiteUrl() {
             var feed = new SyndicationFeed {
                 Title = "Test feed",
                 Description = "Test description"
             };
 
-            var rssGenerator = new Rss20SyndicationGenerator();
-            Assert.Throws<ArgumentException>(() => rssGenerator.Generate(feed));
+            var generator = new Rss20SyndicationGenerator();
+            Assert.Throws<ArgumentException>(() => generator.Generate(feed));
         }
 
         [Fact]
-        public void RssGeneratorSetsChannelProperties() {
+        public void GeneratorSetsChannelProperties() {
             var feed = new SyndicationFeed {
                 Title = "Test feed",
                 Description = "Test description",
@@ -54,8 +54,8 @@ namespace SyndicationCore.Tests {
                 FeedUrl = new Uri("http://localhost/rss/")
             };
 
-            var rssGenerator = new Rss20SyndicationGenerator();
-            var result = rssGenerator.Generate(feed);
+            var generator = new Rss20SyndicationGenerator();
+            var result = generator.Generate(feed);
 
             XNamespace nsAtom = "http://www.w3.org/2005/Atom";
 
@@ -71,7 +71,7 @@ namespace SyndicationCore.Tests {
         }
 
         [Fact]
-        public void RssGeneratorSetsItemProperties() {
+        public void GeneratorSetsItemProperties() {
             var feed = new SyndicationFeed {
                 Title = "Test feed",
                 Description = "Test description",
@@ -90,8 +90,8 @@ namespace SyndicationCore.Tests {
                 }
             };
 
-            var rssGenerator = new Rss20SyndicationGenerator();
-            var result = rssGenerator.Generate(feed);
+            var generator = new Rss20SyndicationGenerator();
+            var result = generator.Generate(feed);
 
             var item = result.Descendants("item").FirstOrDefault();
             Assert.NotNull(item);

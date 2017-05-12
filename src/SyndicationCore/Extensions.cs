@@ -8,6 +8,13 @@ namespace SyndicationCore {
             return doc.ToString();
         }
 
+        public static string ToRFC822(this DateTime? date) {
+            if(!date.HasValue)
+                return null;
+            
+            return date.Value.ToRFC822();
+        }
+
         public static string ToRFC822(this DateTime date) {
             var offset = TimeZoneInfo.Local.Base​Utc​Offset.Hours;
             var timeZone = "+" + offset.ToString().PadLeft(2, '0');
@@ -17,6 +24,17 @@ namespace SyndicationCore {
             }
  
             return date.ToString("ddd, dd MMM yyyy HH:mm:ss " + timeZone.PadRight(5, '0'));
+        }
+
+        public static string ToRFC3339(this DateTime? date) {
+            if(!date.HasValue)
+                return null;
+            
+            return date.Value.ToRFC3339();
+        }
+
+        public static string ToRFC3339(this DateTime date) {
+            return date.ToString("yyyy-MM-ddTHH:mm:sszzz");
         }
 
         public static void AddOptionalElement(this XElement element, XName name, object content) {
