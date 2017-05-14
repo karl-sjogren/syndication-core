@@ -24,8 +24,10 @@ namespace SyndicationCore {
         public List<string> Categories { get; set; } = new List<string>();
         public Uri Comments { get; set; }
         public Uri Link { get; set; }
+        public Uri Image { get; set; }
+        public string ImageMimeType { get; set; }
         public string Permalink { get; set; }
-        public DateTime PublishDate { get; set; }
+        public DateTime? PublishDate { get; set; }
     }
 
     public class Author {

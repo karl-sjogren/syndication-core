@@ -1,8 +1,17 @@
 using System;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace SyndicationCore {
+    /// <summary>
+    /// Generates a feed according to http://cyber.harvard.edu/rss/rss.html
+    /// </summary>
     public class Rss20SyndicationGenerator : ISyndicationGenerator {
+        private ILogger _log;
+
+        public Rss20SyndicationGenerator(ILoggerFactory loggerFactory = null) {
+            _log = loggerFactory?.CreateLogger<AtomSyndicationGenerator>();
+        }
         public XDocument Generate(SyndicationFeed feed) {
             if(string.IsNullOrWhiteSpace(feed.Title))
                 throw new ArgumentException("Title needs to be set.");
@@ -22,7 +31,7 @@ namespace SyndicationCore {
 
             // Required fields
             channel.Add(new XElement("title", feed.Title));
-            channel.Add(new XElement("link", feed.SiteUrl));
+            channel.Add(new XElement("link", feed.SiteUrl.AbsoluteUri));
             channel.Add(new XElement("description", feed.Description));
 
             // Calculated fields
@@ -32,12 +41,13 @@ namespace SyndicationCore {
             // Optional fields
             channel.AddOptionalElement("category", string.Join(" / ", feed.Categories));
             channel.AddOptionalElement("language", feed.Language?.ToString());
-            channel.AddOptionalElement("image", feed.Image?.ToString());
+            channel.AddOptionalElement("image", feed.Image?.AbsoluteUri);
 
-            channel.Add(new XElement(nsAtom + "link",
-                new XAttribute("href", feed.FeedUrl),
-                new XAttribute("rel", "self"),
-                new XAttribute("type", "application/rss+xml")));
+            if(feed.FeedUrl != null)
+                channel.Add(new XElement(nsAtom + "link",
+                    new XAttribute("href", feed.FeedUrl.AbsoluteUri),
+                    new XAttribute("rel", "self"),
+                    new XAttribute("type", "application/rss+xml")));
 
             if(feed.TimeToLive != TimeSpan.Zero)
                 channel.Add(new XElement("ttl", feed.TimeToLive.TotalMinutes));
@@ -47,7 +57,7 @@ namespace SyndicationCore {
 
                 if(string.IsNullOrWhiteSpace(item.Title) && string.IsNullOrWhiteSpace(item.Body)) {
                     // Either Title or Description must be set for an item to be valid
-                    // A logger would be nice here
+                    _log?.LogWarning($"Invalid item, missing title or body.");
                     continue;
                 }
 
@@ -56,17 +66,23 @@ namespace SyndicationCore {
                     author += $" ({item.Author.Name})";
 
                 element.AddOptionalElement("title", item.Title);
-                element.AddOptionalElement("link", item.Link);
+                element.AddOptionalElement("link", item.Link?.AbsoluteUri);
                 element.AddOptionalElement("author", author);
-                element.AddOptionalElement("pubDate", item.PublishDate.ToRFC822());
+                element.AddOptionalElement("pubDate", item.PublishDate?.ToRFC822());
                 element.AddOptionalElement("category", string.Join(" / ", item.Categories));
                 element.AddOptionalElement("guid", item.Permalink);
 
                 if(!string.IsNullOrWhiteSpace(item.Body))
                     element.Add(new XElement("description", item.Body));
 
+                if(item.Image != null && !string.IsNullOrWhiteSpace(item.ImageMimeType))
+                    element.Add(new XElement("enclosure",
+                        new XAttribute("url", item.Image),
+                        new XAttribute("length", 0),
+                        new XAttribute("tyoe", item.ImageMimeType)));
+
                 if(!string.IsNullOrWhiteSpace(feed.Title) && feed.FeedUrl != null)
-                    element.Add(new XElement("source", feed.Title, new XAttribute("url", feed.FeedUrl)));
+                    element.Add(new XElement("source", feed.Title, new XAttribute("url", feed.FeedUrl.AbsoluteUri)));
 
                 channel.Add(element);
             }
