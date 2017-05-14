@@ -1,11 +1,18 @@
 using System;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace SyndicationCore {
     /// <summary>
     /// Generates a feed according to https://validator.w3.org/feed/docs/atom.html
     /// </summary>
     public class AtomSyndicationGenerator : ISyndicationGenerator {
+        private ILogger _log;
+
+        public AtomSyndicationGenerator(ILoggerFactory loggerFactory = null) {
+            _log = loggerFactory?.CreateLogger<AtomSyndicationGenerator>();
+        }
+        
         public XDocument Generate(SyndicationFeed feed) {
             if(string.IsNullOrWhiteSpace(feed.Title))
                 throw new ArgumentException("Title needs to be set.");
@@ -54,7 +61,7 @@ namespace SyndicationCore {
                 if(string.IsNullOrWhiteSpace(item.Title) || string.IsNullOrWhiteSpace(item.Body) || string.IsNullOrWhiteSpace(item.Permalink) || !item.PublishDate.HasValue) {
                     // Title, Body and PublishDate must be set for an item to be valid. There are alternatives for this
                     // in the specification, but those won't be supported for now.
-                    // A logger would be nice here
+                    _log?.LogWarning($"Invalid item, missing title, body, permalink or publishdate.");
                     continue;
                 }
 

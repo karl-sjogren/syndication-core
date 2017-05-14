@@ -1,11 +1,17 @@
 using System;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace SyndicationCore {
     /// <summary>
     /// Generates a feed according to http://cyber.harvard.edu/rss/rss.html
     /// </summary>
     public class Rss20SyndicationGenerator : ISyndicationGenerator {
+        private ILogger _log;
+
+        public Rss20SyndicationGenerator(ILoggerFactory loggerFactory = null) {
+            _log = loggerFactory?.CreateLogger<AtomSyndicationGenerator>();
+        }
         public XDocument Generate(SyndicationFeed feed) {
             if(string.IsNullOrWhiteSpace(feed.Title))
                 throw new ArgumentException("Title needs to be set.");
@@ -51,7 +57,7 @@ namespace SyndicationCore {
 
                 if(string.IsNullOrWhiteSpace(item.Title) && string.IsNullOrWhiteSpace(item.Body)) {
                     // Either Title or Description must be set for an item to be valid
-                    // A logger would be nice here
+                    _log?.LogWarning($"Invalid item, missing title or body.");
                     continue;
                 }
 
